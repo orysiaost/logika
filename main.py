@@ -5,6 +5,21 @@ from main_window import *
 from random import choice, shuffle #виб. ранд. ел.зі списку \ перемішує елементи списку
 from time import sleep
 
+wins = [main_win, menu_win]
+for win in wins:
+    win.setStyleSheet('''
+                      color: violet;   
+                      background-color: light-blue;
+                      font-size: 20px;
+                      border: 0.5px solid black;
+                      ''')
+    
+lb_Result.setStyleSheet('margin: 20px;')
+
+# колір тексту
+# колір фону
+# розмір тексту
+# розмір і колір рамок
 
 # клас Питання 
 class Question():
@@ -29,16 +44,27 @@ class Question():
         self.attempts += 1
 
 # питання
-q1 = Question('В якому році дебютувала команда "Stray Kids"?', '2018', '2019', '2020', '2021')
+q1 = Question('Який рік був заснований Stray Kids?', '2017', '2018', '2019', '2020')
 q2 = Question('Скільки є учасників групи?', '8', '9', '7', '5')
 q3 = Question('Яка пісня найбільше набрала переглядів?', 'God`s Menu', 'Taste', 'Super Bowl', 'Domino')
 q4 = Question('Про що йдеться в пісні "Domino"?', 'Про стандарти світу', 'Про моду', 'Про булінг', 'Про вибір в житті')
 q5 = Question('Якою мовою співає група?','корейською, англійською та японською','японською','англійською','корейською')
 q6 = Question('Хто придумав назву групи?','Бан Чан','Симін','компанія JYP','Лі Но')
+q7 = Question('Який альбом Stray Kids був їх дебютним?', '"I Am NOT"', '"Go Live"', '"Cle 1: MIROH"', '"Noeasy"')
+q8 = Question('Хто є лідером Stray Kids?', 'Bang Chan', 'Han', 'Hyunjin', 'Han')
+q9 = Question('Яка пісня була першим синглом Stray Kids?', '"District 9"', '"Hellevator"', '"Back Door"', '"God`s Menu"')
+q10 = Question('Який з учасників Stray Kids є головним вокалістом?', 'Seungmin', 'Han', 'Woojin', 'Hyunjin')
+q11 = Question('', '', '', '', '')
+q12 = Question('', '', '', '', '')
+q13 = Question('', '', '', '', '')
+q14 = Question('', '', '', '', '')
+q15 = Question('', '', '', '', '')
 
 # список з перемикачів кнопок та питань
 radio_list = [rbtn_1, rbtn_2, rbtn_3, rbtn_4]
 questions = [q1, q2, q3, q4, q5, q6]
+
+
 
 #                                         (функція що обирає випадкове запитання зі списку та показує його на екрані)
 def new_question():
@@ -56,18 +82,19 @@ def new_question():
     radio_list[3].setText(cur_question.answer)
 
 
-
 #                                                   (функція для перевірки результату відповіді)
 def check_result():
     for ans_btn in radio_list:
         if ans_btn.isChecked():                         # вибраний вірних перемикач?
             if ans_btn.text() == lb_Correct.text():     # чи збігається текст на вибр.кпонці та текст прав.відповіді?
                 cur_question.got_right()                # збільшити кільк.спроб +1
-                lb_Result.setText('Правильно!')         
+                lb_Result.setText('Правильно!')
+                update_statistics()        
                 break
     else:
         cur_question.got_wrong()                 #якщо не вибр.прав.відп.
         lb_Result.setText('Неправильно! :)')     #змінити надпис на НЕПРАВИЛЬНО
+        update_statistics()
 
 #                                               (функцію-обробник кнопки “Відпочити”)
 def rest():
@@ -120,8 +147,17 @@ def switch_screen():
         RadioGroup.setExclusive(True) # повернули обмеження, тепер лише одна радіокнопка може бути вибрана
 
 # ----------------------------------------------------------
+# Функція для оновлення статистики і вкиликати в перевірці
+# ----------------------------------------------------------
+def update_statistics():
+    total_attempts = sum(q.attempts for q in questions)
+    total_correct = sum(q.correct for q in questions)
+    lbl_statistics.setText(f"Статистика:\nПравильних відповідей: {total_correct}\nЗагальна кількість спроб: {total_attempts}")
+
+# ----------------------------------------------------------
 #  Пікючення виклику функції - до кнопок
 # ----------------------------------------------------------
+
 new_question()
 
 btn_Menu.clicked.connect(show_menu)
@@ -131,6 +167,9 @@ btn_Sleep.clicked.connect(rest)
 btn_OK.clicked.connect(switch_screen)
 btn_add_q.clicked.connect(add_question)
 
-
 main_win.show()
 app.exec_()
+
+
+
+

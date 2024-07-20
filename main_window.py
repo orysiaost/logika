@@ -5,8 +5,9 @@ from PyQt5.QtWidgets import *
 main_win = QWidget()
 main_win.resize(600, 500)
 main_win.move(300, 300)
+main_win.setWindowTitle("Питання")
 
-# ----------------------------------------------------------
+#  
 # Створюємо потрібні віджети (Кнопки - таймер - надпис)
 # ----------------------------------------------------------
 btn_Menu = QPushButton('Меню')               # кнопка повернення до основного вікна
@@ -100,3 +101,4 @@ layout_cards.addStretch(1)
 layout_cards.setSpacing(5) # прогалини між вмістом
 
 main_win.setLayout(layout_cards) # передаємо на головне вікно основний макет
+
