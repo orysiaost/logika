@@ -1,175 +1,40 @@
-# Підключення модулів
-from menu_window import *
-from main_window import *
+from PyQt5.QtWidgets import QApplication # Імпорт класів для створення об’єктів вікна та додатку.
+from PyQt5.QtWidgets import QMainWindow
+from ui import Ui_MainWindow             # Імпорт класу інтерфейсу з ui.py
 
-from random import choice, shuffle #виб. ранд. ел.зі списку \ перемішує елементи списку
-from time import sleep
+import random # імпортуємо рандом
 
-wins = [main_win, menu_win]
-for win in wins:
-    win.setStyleSheet('''
-                      color: violet;   
-                      background-color: light-blue;
-                      font-size: 20px;
-                      border: 0.5px solid black;
-                      ''')
-    
-lb_Result.setStyleSheet('margin: 20px;')
+class Widget(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.ui.btn_generate.clicked.connect(self.example)  # підключаємо виклик фукнції на кнопку
 
-# колір тексту
-# колір фону
-# розмір тексту
-# розмір і колір рамок
+    # метод для генерації пародів (або з букв або з цифр)
+    def example(self):
+       signs = ''                                # Ініціалізація змінної для зберігання символів, з яких буде формуватися випадковий рядок.
 
-# клас Питання 
-class Question():
-    def __init__(self, question, answer, wrong_answer1, wrong_answer2, wrong_answer3):
-        self.question = question             # питання
-        self.answer = answer                 # відповідь
-        self.wrong_answer1 = wrong_answer1   # непр.відп.1
-        self.wrong_answer2 = wrong_answer2
-        self.wrong_answer3 = wrong_answer3
+       # Перевіряється, чи встановлений прапорець 'cb_alphabet'. Якщо так, додаються символи латинського алфавіту.
+       if self.ui.cb_alphabet.isChecked():      
+           signs = 'qwertyuiopsdfghjklzxcvbnm'
 
-        self.actual = True  # чи актуальне питання
-        self.attempts = 0   # кільк. спроб
-        self.correct = 0    # кільк. прав.відп.
+       # Перевіряється, чи встановлений прапорець 'cb_numbers'. Якщо так, додаються цифри до існуючих символів.
+       if self.ui.cb_numbers.isChecked():
+           signs += '0123456789'
+      
+       result = ''                           # Ініціалізація змінної для зберігання результату  
+       number = random.randint(5, 10)        # рандомиться довжина паролю    
+       for i in range(number):
+           result += random.choice(signs)    
+      
+       self.ui.result.setText(result)        # пароль передається на надпис
 
-    def got_right(self):
-        ''' змінює статистику, отримавши правильну відповідь'''
-        self.attempts += 1
-        self.correct += 1
-
-    def got_wrong(self):
-        ''' змінює статистику, отримавши неправильну відповідь'''
-        self.attempts += 1
-
-# питання
-q1 = Question('Який рік був заснований Stray Kids?', '2017', '2018', '2019', '2020')
-q2 = Question('Скільки є учасників групи?', '8', '9', '7', '5')
-q3 = Question('Яка пісня найбільше набрала переглядів?', 'God`s Menu', 'Taste', 'Super Bowl', 'Domino')
-q4 = Question('Про що йдеться в пісні "Domino"?', 'Про стандарти світу', 'Про моду', 'Про булінг', 'Про вибір в житті')
-q5 = Question('Якою мовою співає група?','корейською, англійською та японською','японською','англійською','корейською')
-q6 = Question('Хто придумав назву групи?','Бан Чан','Симін','компанія JYP','Лі Но')
-q7 = Question('Який альбом Stray Kids був їх дебютним?', '"I Am NOT"', '"Go Live"', '"Cle 1: MIROH"', '"Noeasy"')
-q8 = Question('Хто є лідером Stray Kids?', 'Bang Chan', 'Han', 'Hyunjin', 'Han')
-q9 = Question('Яка пісня була першим синглом Stray Kids?', '"District 9"', '"Hellevator"', '"Back Door"', '"God`s Menu"')
-q10 = Question('Який з учасників Stray Kids є головним вокалістом?', 'Seungmin', 'Han', 'Woojin', 'Hyunjin')
-q11 = Question('', '', '', '', '')
-q12 = Question('', '', '', '', '')
-q13 = Question('', '', '', '', '')
-q14 = Question('', '', '', '', '')
-q15 = Question('', '', '', '', '')
-
-# список з перемикачів кнопок та питань
-radio_list = [rbtn_1, rbtn_2, rbtn_3, rbtn_4]
-questions = [q1, q2, q3, q4, q5, q6]
+# --------------------------------------
 
 
+app = QApplication([])   # Створення об’єктів вікна та додатку. Показ вікна.
+ex = Widget()
 
-#                                         (функція що обирає випадкове запитання зі списку та показує його на екрані)
-def new_question():
-    global cur_question
-    cur_question = choice(questions)                   #вибирає рандомне запитання
-
-    lb_Question.setText(cur_question.question)         #встановлює текст(відповіді та запитання) на віджети
-    lb_Correct.setText(cur_question.answer)
-
-    shuffle(radio_list)                                 #перемішує кнопки(щоб не на 1 шій була завжди прав.відпов.)- змінюючи позицію в списку
-    
-    radio_list[0].setText(cur_question.wrong_answer1)   #розмішюємо на них знову питання
-    radio_list[1].setText(cur_question.wrong_answer2)
-    radio_list[2].setText(cur_question.wrong_answer3)   #в новому порядку
-    radio_list[3].setText(cur_question.answer)
-
-
-#                                                   (функція для перевірки результату відповіді)
-def check_result():
-    for ans_btn in radio_list:
-        if ans_btn.isChecked():                         # вибраний вірних перемикач?
-            if ans_btn.text() == lb_Correct.text():     # чи збігається текст на вибр.кпонці та текст прав.відповіді?
-                cur_question.got_right()                # збільшити кільк.спроб +1
-                lb_Result.setText('Правильно!')
-                update_statistics()        
-                break
-    else:
-        cur_question.got_wrong()                 #якщо не вибр.прав.відп.
-        lb_Result.setText('Неправильно! :)')     #змінити надпис на НЕПРАВИЛЬНО
-        update_statistics()
-
-#                                               (функцію-обробник кнопки “Відпочити”)
-def rest():
-    main_win.hide()                 # приховати головний віджет    
-    n = box_Minutes.value() * 60    # бере знач.від корситвача і множить на кільк. секунд
-    sleep(n)                        # спить
-    main_win.show()                 # потім знову показує
-
-# ----------------------------------------------------------
-#  Функції для кнопок панелі - дод.питання та статистика
-# ----------------------------------------------------------
-def show_menu():      
-    menu_win.show()
-    main_win.hide()
-
-def back_menu():
-    menu_win.hide()
-    main_win.show()
-
-def clear():
-    txt_Question.clear()
-    txt_Answer.clear()
-    txt_Wrong1.clear()
-    txt_Wrong2.clear()
-    txt_Wrong3.clear()
-
-def add_question():
-    newq = Question(txt_Question.text(), txt_Answer.text(), txt_Wrong1.text(), txt_Wrong2.text(), txt_Wrong3.text())
-    questions.append(newq)
-    clear()
-
-#   функція зміни(запинать та надписів на кнопках)
-def switch_screen():
-    if btn_OK.text() == 'Відповісти':
-        check_result()   #
-        RadioGroupBox.hide()
-        AnsGroupBox.show()
-        btn_OK.setText('Наступне запитання')
-    else:
-        new_question() #
-        RadioGroupBox.show()
-        AnsGroupBox.hide()
-        btn_OK.setText('Відповісти')
-                                            # скинути вибрану радіо-кнопку
-        RadioGroup.setExclusive(False) # зняли обмеження, щоб можна було скинути вибір радіокнопки
-        rbtn_1.setChecked(False)
-        rbtn_2.setChecked(False)
-        rbtn_3.setChecked(False)
-        rbtn_4.setChecked(False)
-        RadioGroup.setExclusive(True) # повернули обмеження, тепер лише одна радіокнопка може бути вибрана
-
-# ----------------------------------------------------------
-# Функція для оновлення статистики і вкиликати в перевірці
-# ----------------------------------------------------------
-def update_statistics():
-    total_attempts = sum(q.attempts for q in questions)
-    total_correct = sum(q.correct for q in questions)
-    lbl_statistics.setText(f"Статистика:\nПравильних відповідей: {total_correct}\nЗагальна кількість спроб: {total_attempts}")
-
-# ----------------------------------------------------------
-#  Пікючення виклику функції - до кнопок
-# ----------------------------------------------------------
-
-new_question()
-
-btn_Menu.clicked.connect(show_menu)
-btn_back.clicked.connect(back_menu)
-btn_clear.clicked.connect(clear)
-btn_Sleep.clicked.connect(rest)
-btn_OK.clicked.connect(switch_screen)
-btn_add_q.clicked.connect(add_question)
-
-main_win.show()
+ex.show()
 app.exec_()
-
-
-
-
